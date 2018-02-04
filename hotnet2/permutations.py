@@ -1,14 +1,14 @@
 from collections import defaultdict, namedtuple
 import multiprocessing as mp
 import random
-from constants import Mutation, SNV
-import heat
-import hnio
+from .constants import Mutation, SNV
+from . import heat
+from . import hnio
 
 ################################################################################
 # Heat permutation
 
-def heat_permutation_wrapper((heat_scores, eligible_genes)):
+def heat_permutation_wrapper(heat_scores, eligible_genes):
     permuted_genes = list(eligible_genes)
     random.shuffle(permuted_genes)
     permuted_genes = permuted_genes[:len(heat_scores)]
@@ -29,30 +29,27 @@ def permute_heat(heat, network_genes, num_permutations, addtl_genes=None, num_co
     num_cores -- number of cores to use for running in parallel
     
     """
-    if num_cores != 1:
-        pool = mp.Pool(None if num_cores == -1 else num_cores)
-        map_fn = pool.map
-    else:
-        map_fn = map
-
     heat_scores = heat.values()
     if not addtl_genes: addtl_genes = set()
     genes_eligible_for_heat = set(heat.keys()).union(addtl_genes).intersection(network_genes)
     
     args = [(heat_scores, genes_eligible_for_heat)] * num_permutations
-    permutations = map_fn(heat_permutation_wrapper, args)
     
     if num_cores != 1:
+        pool = mp.Pool(None if num_cores == -1 else num_cores)
+        permutations = pool.starmap(heat_permutation_wrapper, args)
         pool.close()
         pool.join()
+    else:
+        permutations = [heat_permutation_wrapper(*i) for i in args]
 
     return permutations
 
 ################################################################################
 # Mutation permutation
 
-def mutation_permuation_heat_wrapper((samples, genes, cnas, gene2length, bmr, gene2bmr, gene2chromo,
-                                     chromo2genes, cna_filter_threshold, min_freq)):
+def mutation_permuation_heat_wrapper(samples, genes, cnas, gene2length, bmr, gene2bmr, gene2chromo,
+                                     chromo2genes, cna_filter_threshold, min_freq):
     permuted_snvs = permute_snvs(samples, genes, gene2length, bmr, gene2bmr)
     permuted_cnas = permute_cnas(cnas, gene2chromo, chromo2genes)
     if cna_filter_threshold:

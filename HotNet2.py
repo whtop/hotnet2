@@ -80,13 +80,13 @@ def run(args):
 
     # Run HotNet2 on each pair of network and heat files
     if args.verbose > 0:
-        print '* Running HotNet2 in consensus mode...'
+        print ('* Running HotNet2 in consensus mode...')
 
     single_runs, consensus, linkers, auto_deltas, consensus_stats = consensus_with_stats(args, networks, heats)
 
     # Output the single runs
     if args.verbose > 0:
-        print '* Outputting results to file...'
+        print ('* Outputting results to file...')
 
     params = vars(args)
     result_dirs = []
@@ -111,7 +111,7 @@ def run(args):
     # Create the visualization(s). This has to be after the consensus procedure
     # is run because we want to default to the auto-selected deltas.
     if args.verbose > 0:
-        print '* Generating and outputting visualization data...'
+        print ('* Generating and outputting visualization data...')
 
     d_score = hnio.load_display_score_tsv(args.display_score_file) if args.display_score_file else None
     d_name = hnio.load_display_name_tsv(args.display_name_file) if args.display_name_file else dict()
@@ -131,9 +131,27 @@ def run(args):
     consensus_auto_delta = 0
     results = [[consensus_ccs, consensus_stats, consensus_auto_delta]]
     with open('{}/consensus/viz-data.json'.format(args.output_directory), 'w') as OUT:
-        output = hnviz.generate_viz_json(results, G.edges(), network_name, heat, snvs, cnas, sampleToType, d_score, d_name)
+        output = hnviz.generate_viz_json(results, G.edges(), network_name, heat, snvs, cnas, sampleToType, d_score, d_name) 
         output['params'] = dict(consensus=True, auto_delta=format(consensus_auto_delta, 'g'))
         json.dump( output, OUT )
 
 if __name__ == "__main__":
-    run(get_parser().parse_args(sys.argv[1:]))
+    
+    try :
+        __IPYTHON__
+        
+    except NameError:
+        run(get_parser().parse_args(sys.argv[1:]))
+        
+    else:
+        parser = get_parser()
+        args = parser.parse_args("""
+            --network_files example/influence_matrices/example_ppr_0.6.h5
+            --permuted_network_paths example/influence_matrices/permuted/example_ppr_0.6_##NUM##.h5
+            --display_score_file example/example.dscore
+            --heat_file example/example.heat
+            --output_directory example/output/simple
+            --network_permutations 10
+            --heat_permutations 10
+        """.split())
+        run(args)

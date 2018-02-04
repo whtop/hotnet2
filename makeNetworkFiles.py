@@ -66,8 +66,8 @@ def run(args):
 
     # make permuted edge lists
     if args.num_permutations > 0:
-        print "\nCreating edge lists for permuted networks"
-        print "-------------------------------------------"
+        print ("\nCreating edge lists for permuted networks")
+        print ("-------------------------------------------")
         perm_dir = '%s/permuted' % args.output_dir
         perm_path = '{}/{}_ppr_{:g}_##NUM##.h5'.format(perm_dir, args.prefix, args.beta)
         if not os.path.exists(perm_dir): os.makedirs(perm_dir)
@@ -76,8 +76,8 @@ def run(args):
         permute.run(permute.get_parser().parse_args(pargs.split()))
 
         # make permuted PPRs
-        print "\nCreating PPR matrices for permuted networks"
-        print "---------------------------------------------"
+        print ("\nCreating PPR matrices for permuted networks")
+        print ("---------------------------------------------")
         diffusion_args = []
         params = dict(network_name=args.network_name, beta=args.beta)
         for i in range(args.permutation_start_index, args.permutation_start_index + args.num_permutations):
@@ -89,4 +89,19 @@ def run(args):
             save_diffusion_to_file( HOTNET2, args.beta, args.gene_index_file, edge_file, output_file, params=params, verbose=0 )
 
 if __name__ == "__main__":
-    run(get_parser().parse_args(sys.argv[1:]))
+    
+    try :
+        __IPYTHON__
+        
+    except NameError:
+        run(get_parser().parse_args(sys.argv[1:]))
+        
+    else:
+        parser = get_parser()
+        args = parser.parse_args("""
+        --prefix example --gene_index_file example/example_gene_index.txt 
+        --edgelist_file example/example_edgelist.txt --beta 0.6
+        --output_dir example/influence_matrices --num_permutations 10
+        --network_name wh 
+        """.split())
+        run(args)

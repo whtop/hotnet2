@@ -1,7 +1,7 @@
 from collections import defaultdict
 from math import log10
 import scipy
-from constants import Mutation, SNV, AMP, DEL
+from .constants import Mutation, SNV, AMP, DEL
 
 def filter_heat(heat, min_score, zero_genes=False, message=None):
     """Returns (1) a dict mapping gene names to heat scores where all non-zero heat scores are at
@@ -24,7 +24,7 @@ def filter_heat(heat, min_score, zero_genes=False, message=None):
 
     filtered_genes = set()
     filtered_heat = dict()
-    for gene, score in heat.iteritems():
+    for gene, score in heat.items():
         if score >= min_score:
             filtered_heat[gene] = score
         else:
@@ -33,7 +33,7 @@ def filter_heat(heat, min_score, zero_genes=False, message=None):
                 filtered_heat[gene] = 0
 
     if message and len(filtered_genes) > 0:
-        print '\t- ' + message.replace('##', str(len(filtered_genes)))
+        print ('\t- ' + message.replace('##', str(len(filtered_genes))))
 
     return filtered_heat, filtered_genes
 
@@ -136,8 +136,8 @@ def mut_heat(genes, num_samples, snvs, cnas, min_freq):
 
 NULL = 100
 def fm_heat(gene2heat, fm_threshold, cis_threshold=0.01, CIS=False):
-    print "* Creating oncodrive heat map..."
-    if CIS: print "\tIncluding CIS scores at threshold", cis_threshold, "..."
+    print ("* Creating oncodrive heat map...")
+    if CIS: print ("\tIncluding CIS scores at threshold", cis_threshold, "...")
     heat = dict()
     src_fm, src_cis_amp, src_cis_del = 0, 0, 0
     for g, scores in gene2heat.items():
@@ -155,29 +155,29 @@ def fm_heat(gene2heat, fm_threshold, cis_threshold=0.01, CIS=False):
             if scores["fm"] >= fm_threshold: continue
             heat[g] = -log10(scores["fm"])
             src_fm += 1
-    print "\t- Genes using FM score:", src_fm
-    print "\t- Genes using CIS AMP score:", src_cis_amp
-    print "\t- Genes using CIS DEL score:", src_cis_del
+    print ("\t- Genes using FM score:", src_fm)
+    print ("\t- Genes using CIS AMP score:", src_cis_amp)
+    print ("\t- Genes using CIS DEL score:", src_cis_del)
 
     return heat
 
 def mutsig_heat(gene2mutsig, threshold=1.0):
-    print "* Creating MutSig heat map..."
+    print ("* Creating MutSig heat map...")
     gene2heat = dict((gene, -log10(score["qval"]))
                      for gene, score in gene2mutsig.items()
                      if score["qval"] < threshold)
-    print "\t- Including", len(gene2heat), "genes at threshold", threshold
+    print ("\t- Including", len(gene2heat), "genes at threshold", threshold)
     return gene2heat
 
 def music_heat(gene2music, threshold=1.0, max_heat=15):
-    print "* Creating MuSiC heat map..."
-    print "\t- Mapping q-values of 0 to", max_heat
+    print ("* Creating MuSiC heat map...")
+    print ("\t- Mapping q-values of 0 to", max_heat)
     def music_heat(qvals):
         heat = scipy.median([ qvals["FDR_CT"], qvals["FDR_LRT"], qvals["FDR_FCPT"] ])
         return -log10(heat) if heat != 0 else max_heat
     gene2heat = dict((gene, music_heat(scores)) for gene, scores in gene2music.items()
                      if scipy.median(scores.values()) < threshold)
-    print "\t- Including", len(gene2heat), "genes at threshold", threshold
+    print ("\t- Including", len(gene2heat), "genes at threshold", threshold)
     return gene2heat
 
 def filter_heat_to_network_genes(gene2heat, network_genes, verbose):
@@ -190,14 +190,14 @@ def filter_heat_to_network_genes(gene2heat, network_genes, verbose):
     """
     filtered_heat = dict()
     num_removed = 0
-    for gene, heat in gene2heat.iteritems():
+    for gene, heat in gene2heat.items():
         if gene in network_genes:
             filtered_heat[gene] = heat
         else:
             num_removed += 1
 
     if verbose > 1 and num_removed > 0:
-        print "\t- Removing %s genes not in the network" % num_removed
+        print ("\t- Removing %s genes not in the network" % num_removed)
 
     return filtered_heat
 
@@ -215,10 +215,10 @@ def reconcile_heat_with_tested_genes(gene2heat, tested_genes):
 
     num_removed = len(set(gene2heat.keys()).difference(tested_genes))
     if num_removed > 0:
-        print "\t- Removing %s genes not in gene_filter_file" % num_removed
+        print ("\t- Removing %s genes not in gene_filter_file" % num_removed)
 
     num_zeroed = len(set(tested_genes).difference(gene2heat.keys()))
     if num_zeroed > 0:
-        print "\t- Assigned score 0 to %s genes in gene file without scores" % num_zeroed
+        print ("\t- Assigned score 0 to %s genes in gene file without scores" % num_zeroed)
 
     return filtered_heat

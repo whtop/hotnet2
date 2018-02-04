@@ -1,0 +1,113 @@
+{
+    "consensus": [
+        {
+            "core": [
+                "gene4",
+                "gene11",
+                "gene24",
+                "gene9",
+                "gene19",
+                "gene22",
+                "gene13",
+                "gene21",
+                "gene17",
+                "gene18",
+                "gene14",
+                "gene15",
+                "gene20",
+                "gene10",
+                "gene23",
+                "gene25",
+                "gene16",
+                "gene8",
+                "gene7",
+                "gene12"
+            ],
+            "expansion": []
+        },
+        {
+            "core": [
+                "gene1",
+                "gene2",
+                "gene3"
+            ],
+            "expansion": []
+        }
+    ],
+    "deltas": [
+        0.025225308490917087
+    ],
+    "linkers": [],
+    "params": {
+        "consensus_permutations": 0,
+        "delta": 0.025225308490917087,
+        "deltas": [],
+        "display_name_file": null,
+        "display_score_file": "example/example.dscore",
+        "heat_files": [
+            "example/example.heat"
+        ],
+        "heat_name": "example",
+        "heat_permutations": 10,
+        "min_cc_size": 2,
+        "network_files": [
+            "example/influence_matrices/example_ppr_0.6.h5"
+        ],
+        "network_name": "wh",
+        "network_permutations": 10,
+        "num_cores": 1,
+        "output_directory": "example/output/simple",
+        "output_hierarchy": false,
+        "permuted_network_paths": [
+            "example/influence_matrices/permuted/example_ppr_0.6_##NUM##.h5"
+        ],
+        "verbose": 1
+    },
+    "stats": {
+        "2": {
+            "expected": 0.0,
+            "observed": 2,
+            "pval": 1.0
+        },
+        "3": {
+            "expected": 0.0,
+            "observed": 2,
+            "pval": 1.0
+        },
+        "4": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "5": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "6": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "7": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "8": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "9": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        },
+        "10": {
+            "expected": 0.0,
+            "observed": 1,
+            "pval": 1.0
+        }
+    }
+}

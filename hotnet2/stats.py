@@ -2,8 +2,7 @@
 from collections import defaultdict
 import multiprocessing as mp
 import networkx as nx
-import hotnet2 as hn
-import hnio
+from . import hnio, hotnet2 as hn
 
 strong_ccs = nx.strongly_connected_components
 
@@ -19,12 +18,12 @@ def num_components_min_size(G, sizes):
     cc_sizes = [len(cc) for cc in ccs]
     return [sum(1 for cc_size in cc_sizes if cc_size >= s) for s in sizes]
 
-def significance_wrapper((infmat, index2gene, heat_permutation, delta, sizes, directed)):
+def significance_wrapper(infmat, index2gene, heat_permutation, delta, sizes, directed):
     sim, index2gene = hn.similarity_matrix(infmat, index2gene, heat_permutation, directed)
     G = hn.weighted_graph(sim, index2gene, delta, directed)
     return num_components_min_size(G, sizes)
 
-def network_significance_wrapper((network_path, infmat_name, index2gene, heat, delta, sizes, directed)):
+def network_significance_wrapper(network_path, infmat_name, index2gene, heat, delta, sizes, directed):
     permuted_mat = np.asarray(hnio.load_hdf5(network_path)[infmat_name], dtype=np.float32)
     sim, index2gene = hn.similarity_matrix(permuted_mat, index2gene, heat, directed)
     G = hn.weighted_graph(sim, index2gene, delta, directed)
@@ -35,19 +34,15 @@ def calculate_permuted_cc_counts_network(network_paths, infmat_name, index2gene,
     """Return a dict mapping a CC size to a list of the number of CCs of that size or greater in
     each permutation.
     """
-    if num_cores != 1:
-        pool = mp.Pool(None if num_cores == -1 else num_cores)
-        map_fn = pool.map
-    else:
-        map_fn = map
-
     args = [(network_path, infmat_name, index2gene, heat, delta, sizes, directed)
             for network_path in network_paths]
-    all_counts = map_fn(network_significance_wrapper, args)
-
     if num_cores != 1:
+        pool = mp.Pool(None if num_cores == -1 else num_cores)
+        all_counts = pool.starmap(network_significance_wrapper, args)
         pool.close()
         pool.join()
+    else:
+        all_counts = [network_significance_wrapper(*i) for i in  args]
 
     # Parse the results into a map of k -> counts
     size2counts = defaultdict(list)
@@ -73,19 +68,16 @@ def calculate_permuted_cc_counts(infmat, index2gene, heat_permutations, delta,
     num_cores -- number of cores to use for running in parallel
 
     """
-    if num_cores != 1:
-        pool = mp.Pool(None if num_cores == -1 else num_cores)
-        map_fn = pool.map
-    else:
-        map_fn = map
-
     args = [(infmat, index2gene, heat_permutation, delta, sizes, directed)
             for heat_permutation in heat_permutations]
-    all_counts = map_fn(significance_wrapper, args)
-
+    
     if num_cores != 1:
+        pool = mp.Pool(None if num_cores == -1 else num_cores)
+        all_counts = pool.starmap(significance_wrapper, args)
         pool.close()
         pool.join()
+    else:
+        all_counts = [significance_wrapper(*i) for i in args]
 
     # Parse the results into a map of k -> counts
     size2counts = defaultdict(list)

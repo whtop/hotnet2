@@ -53,7 +53,7 @@ def HD(V,A,increasing=False):
                 break
         A = A[np.ix_(component,component)]
         V = slice_vertices(V,component)
-        print 'The graph has %d strongly connected components, but the hierarchical decomposition requires a strongly connected graph.  The decomposition tree considers a subgraph defined by a largest strongly connected component of the original graph %d of its %d vertices.' % (len(SCCs),largest_component_size,number_vertices)
+        print ('The graph has %d strongly connected components, but the hierarchical decomposition requires a strongly connected graph.  The decomposition tree considers a subgraph defined by a largest strongly connected component of the original graph %d of its %d vertices.' % (len(SCCs),largest_component_size,number_vertices))
 
     if increasing:
         base = 0.0
@@ -709,10 +709,10 @@ if __name__ == "__main__":
 
             if S!=T:
                 progress("")
-                print i
-                print A
-                print S
-                print T
+                print (i)
+                print (A)
+                print (S)
+                print (T)
                 return False
 
         progress("")
@@ -806,32 +806,32 @@ if __name__ == "__main__":
     # the vertex clusters.  We reverse the edge order from increasing weights
     # to decreasing weights and repeat.
 
-    print '=== Test 1 ==='
+    print ('=== Test 1 ===')
     V, A, E = tarjan_1983_example()
 
     T = HD(V,A,increasing=True)
     weights, clusters = cluster(T)
 
-    print 'Weights added in increasing order:'
-    print ''
-    print 'Tree:'
-    print prettify(T)
-    print 'Condensing weights:'
-    print prettify(weights)
-    print 'Vertex clusters:'
-    print prettify(clusters)
+    print ('Weights added in increasing order:')
+    print ('')
+    print ('Tree:')
+    print (prettify(T))
+    print ('Condensing weights:')
+    print (prettify(weights))
+    print ('Vertex clusters:')
+    print (prettify(clusters))
 
     T = HD(V,A,increasing=False)
     weights, clusters = cluster(T)
 
-    print 'Weights added in decreasing order:'
-    print ''
-    print 'Tree:'
-    print prettify(T)
-    print 'Condensing weights:'
-    print prettify(weights)
-    print 'Vertex clusters:'
-    print prettify(clusters)
+    print ('Weights added in decreasing order:')
+    print ('')
+    print ('Tree:')
+    print (prettify(T))
+    print ('Condensing weights:')
+    print (prettify(weights))
+    print ('Vertex clusters:')
+    print (prettify(clusters))
 
     # Second, we compare tree from of our implementation of Tarjan's HD
     # algorithm with the tree from our implementation of the naive algorithm,
@@ -839,10 +839,10 @@ if __name__ == "__main__":
     # representation of the tree is unique, so the the trees are the same when
     # the dictionaries are the same and different when different.
 
-    print '=== Test 2 ==='
-    print HD(V,A,True)==HD_naive(E,True)
-    print HD(V,A,False)==HD_naive(E,False)
-    print ''
+    print ('=== Test 2 ===')
+    print (HD(V,A,True)==HD_naive(E,True))
+    print (HD(V,A,False)==HD_naive(E,False))
+    print ('')
 
     # Third, we repeat the previous test on a complete graph, a graph with
     # roughly 70% of its edges removed, and a graph with roughly 40% of its
@@ -853,22 +853,22 @@ if __name__ == "__main__":
     # trees are the same and `False` with additional information if they
     # differ; see `test_HD_correctness` for more details.
 
-    print '=== Test 3 ==='
-    print test_correctness(25,20,True)
-    print test_correctness(25,20,True,sparsity=0.7)
-    print test_correctness(25,20,True,nonuniqueness=0.4)
-    print test_correctness(25,20,False)
-    print test_correctness(25,20,False,sparsity=0.7)
-    print test_correctness(25,20,False,nonuniqueness=0.4)
-    print ''
+    print ('=== Test 3 ===')
+    print (test_correctness(25,20,True))
+    print (test_correctness(25,20,True,sparsity=0.7))
+    print (test_correctness(25,20,True,nonuniqueness=0.4))
+    print (test_correctness(25,20,False))
+    print (test_correctness(25,20,False,sparsity=0.7))
+    print (test_correctness(25,20,False,nonuniqueness=0.4))
+    print ('')
 
     # Fourth, we generate profiling data for our implementation of Tarjan's HD
     # algorithm for a complete random graph with 2000 vertices.  Search for
     # cProfile online for details.
 
-    print '=== Test 4 ==='
+    print ('=== Test 4 ===')
     #    test_profile(2000,True,'tarjan_HD.cprof')
-    print ''
+    print ('')
 
     # Fifth, we examine the performance of our implementation of Tarjan's HD
     # algorithm and the performance of our clustering routine on complete
@@ -878,22 +878,22 @@ if __name__ == "__main__":
     # number of vertices and the shortest runtimes for each trial, and we
     # perform the test for both increasing and decreasing edge weights.
 
-    print '=== Test 5 ==='
+    print ('=== Test 5 ===')
     number_of_vertices, HD_runtimes, clustering_runtimes = test_performance(8,3,True)
 
-    print 'Number of vertices:'
-    print number_of_vertices
-    print 'Runtimes for increasing edge weights:'
-    print HD_runtimes
-    print 'Runtimes for vertex clustering:'
-    print clustering_runtimes
-    print ''
+    print ('Number of vertices:')
+    print (number_of_vertices)
+    print ('Runtimes for increasing edge weights:')
+    print (HD_runtimes)
+    print ('Runtimes for vertex clustering:')
+    print (clustering_runtimes)
+    print ('')
 
     number_of_vertices, HD_runtimes, clustering_runtimes = test_performance(8,3,False)
 
-    print 'Number of vertices:'
-    print number_of_vertices
-    print 'Runtimes for decreasing edge weights:'
-    print HD_runtimes
-    print 'Runtimes for vertex clustering:'
-    print clustering_runtimes
+    print ('Number of vertices:')
+    print (number_of_vertices)
+    print ('Runtimes for decreasing edge weights:')
+    print (HD_runtimes)
+    print ('Runtimes for vertex clustering:')
+    print (clustering_runtimes)
